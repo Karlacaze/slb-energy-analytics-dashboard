@@ -1,25 +1,44 @@
 # SLB Energy Analytics
 
-Plataforma web para analisis de eficiencia de combustible con enfoque en sostenibilidad, analitica visual, mapeo topologico (TDA) y prediccion con Machine Learning.
+SLB Energy Analytics is a web app for analyzing fuel efficiency, identifying low-performance patterns, and supporting operational sustainability decisions.
 
-## Que incluye el proyecto
-- Frontend en `React + TypeScript + Vite`.
-- Backend API en `Flask` para servir opciones y predicciones.
-- Modelo entrenado (`Random Forest + TDA`) cargado desde archivo `.pkl`.
-- Visualizaciones interactivas con `Recharts`.
-- Selector de idioma global: Espanol e Ingles.
+It combines:
+- a React + TypeScript frontend for exploration and monitoring,
+- a Flask backend for model inference,
+- and topological data analysis (TDA) artifacts for structural pattern discovery.
 
-## Funcionalidades principales
-- Introduccion del proyecto, objetivos tecnicos y de sostenibilidad.
-- Analisis de datos:
-  - Distribucion de rendimiento (histograma por rangos).
-  - Tendencia mensual de eficiencia.
-  - Conductores criticos y vehiculos problematicos.
-- Mapeo topologico (TDA) con iframe a `public/mapper_output_bueno.html`.
-- Prediccion de eficiencia por parametros operativos (con API Flask).
-- Dashboard ejecutivo con KPIs, tendencias y alertas.
+## What this project does
 
-## Estructura del repositorio
+The app is organized into five functional sections:
+
+- **Introduction**: project goals, data scope, and expected business impact.
+- **Data Analysis**: distribution views, monthly performance trends, critical drivers, and problematic vehicles.
+- **Topological Mapping (TDA)**: interactive mapper visualization loaded from a static HTML artifact.
+- **Prediction**: model inference workflow based on operational inputs.
+- **Executive Dashboard**: KPI snapshot, trend monitoring, and alert tracking.
+
+The UI supports both **Spanish and English** through a global language selector.
+
+## Tech stack
+
+### Frontend
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- Recharts
+- Framer Motion
+- Lucide icons
+
+### Backend
+- Flask
+- Flask-CORS
+- pandas / numpy
+- scikit-learn
+- joblib
+
+## Repository structure
+
 ```text
 PROYECT/
   src/
@@ -37,88 +56,100 @@ PROYECT/
     Reto_Topologia_Final.pdf
 ```
 
-## Requisitos
-- Node.js 18+ (recomendado 20+)
+## Local setup
+
+### Prerequisites
+- Node.js 18+ (20+ recommended)
 - npm
 - Python 3.10+
 - pip
 
-## Instalacion y ejecucion
-### 1) Frontend
-Desde la raiz del proyecto:
+### 1) Run the frontend
+From the project root:
+
 ```bash
 npm install
 npm run dev
 ```
-Frontend disponible en: `http://localhost:5173`
 
-### 2) Backend
-En otra terminal:
+Frontend URL: `http://localhost:5173`
+
+### 2) Run the backend
+In a second terminal:
+
 ```bash
 cd backend
 python -m venv .venv
-.venv\\Scripts\\activate
+.venv\Scripts\activate
 pip install -r requirements.txt
 python appi.py
 ```
-Backend disponible en: `http://localhost:8000`
 
-## Endpoints API
+Backend URL: `http://localhost:8000`
+
+## API endpoints
+
 Base URL: `http://localhost:8000`
 
-- `GET /health`
-  - Estado general, si modelo y datos estan cargados.
-- `GET /get_options`
-  - Opciones para dropdowns (conductores, vehiculos, division, BL, mercancia, estacion).
-- `POST /predict`
-  - Recibe:
-    - `conductor`
-    - `vehiculo`
-    - `division`
-    - `bl`
-    - `mercancia`
-    - `estacion`
-  - Devuelve prediccion (`EFICIENTE` o `INEFICIENTE`), probabilidad y scores.
-- `GET /model_info`
-  - Metadata del modelo y variables usadas.
+### `GET /health`
+Returns service status and whether model/data were loaded successfully.
 
-## Configuracion de modelo y datos
-El backend espera estos archivos dentro de `backend/`:
+### `GET /get_options`
+Returns dropdown options used in the prediction form:
+- drivers
+- vehicles
+- divisions
+- BLs
+- cargo types
+- stations
+
+### `POST /predict`
+Runs model inference with the selected operational context.
+
+Expected payload:
+
+```json
+{
+  "conductor": "...",
+  "vehiculo": "...",
+  "division": "...",
+  "bl": "...",
+  "mercancia": "...",
+  "estacion": "..."
+}
+```
+
+Response includes:
+- binary prediction (`EFICIENTE` / `INEFICIENTE` from backend output)
+- confidence/probability (if available)
+- feature-level scores (if available)
+
+### `GET /model_info`
+Returns metadata about the loaded model and input features.
+
+## Model and data files
+
+The backend expects these files inside `backend/`:
 - `modelo_rendimiento.pkl`
 - `df_modelo.csv`
 
-Si cambias nombres o rutas, ajusta `backend/appi.py` en `load_model_and_data()`.
+If you move or rename them, update `load_model_and_data()` in `backend/appi.py`.
 
-## Idioma (ES/EN)
-La app tiene selector de idioma en la barra lateral.
-El idioma se propaga a todas las paginas principales:
-- Introduccion
-- Analisis
-- Mapeo
-- Prediccion
-- Dashboard
-- Header y Footer
+## PDF documentation
 
-## PDF del reto
-Si, **si se puede agregar un PDF en GitHub**, pero no reemplaza al `README.md` principal.
+The challenge document is included in the repo:
 
-Forma recomendada:
-1. Guardar el PDF dentro del repo (ej. `docs/Reto_Topologia_Final.pdf`).
-2. Enlazarlo desde el README.
+- [Reto Topologia Final (PDF)](docs/Reto_Topologia_Final.pdf)
 
-En este repo quedo enlazado aqui:
-- [Ver documento del reto (PDF)](docs/Reto_Topologia_Final.pdf)
+## Frontend scripts
 
-## Scripts disponibles (frontend)
-- `npm run dev`: desarrollo local
-- `npm run build`: build de produccion
-- `npm run preview`: previsualizar build
-- `npm run lint`: revisar lint
+- `npm run dev` - start development server
+- `npm run build` - production build
+- `npm run preview` - preview production build
+- `npm run lint` - run lint checks
 
-## Notas
-- La API Flask corre en `0.0.0.0:8000` con `debug=True` en desarrollo.
-- La carpeta `backend/.venv` no deberia subirse a Git.
-- Si usas este proyecto en produccion, mueve secretos y configuraciones a variables de entorno.
+## Notes
 
-## Autor
-Proyecto desarrollado para analisis de eficiencia energetica y deteccion de bajo rendimiento con apoyo de TDA + ML.
+- Backend currently runs with `debug=True` for local development.
+- `backend/.venv` and other generated folders should not be committed.
+- For production use, move runtime configuration to environment variables and disable debug mode.
